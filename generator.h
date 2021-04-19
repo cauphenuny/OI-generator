@@ -25,29 +25,35 @@ void write(T x) {
     while (len--) y /= 10, putchar(x / y + 48), x %= y;
 }
 
-void print(const T& x) {
-    write(x), putchar(' ');
+void print(const char &c) {
+    putchar(c);
 }
 
+void print(const string &s) {
+    cout << s;
+}
+
+template<typename T>
 void print(const vector<T>& a) {
     for (auto i : a) print(i);
     endline();
 }
 
-void println(const T& x) {
-    write(x), endline();
+template<typename T>
+void print(const T& x) {
+    write(x), putchar(' ');
 }
 
-template<typename T>
-void print(const initializer_list<T>& a, char end = '\0') {
-    for (auto i : a) print(i);
-    putchar(end);
+template<typename T, typename ...T2>
+void print(const T& cur, const T2& ...rest) {
+    print(cur);
+    print(rest...);
 }
 
 struct range {
     T l, r;
     T size() const { return r - l + 1; }
-    range(const T& x) { l = 0, r = x; }
+    range(const T& x) { l = 0, r = x - 1; }
     range(const T& _l, const T& _r) { l = _l, r = _r; }
     range(const initializer_list<T>& a) {
         l = *(a.begin());
@@ -233,14 +239,14 @@ tree::tree(const int& size, const range& val_range, int extra = 0) {
 }
 
 void print(tree t) {
-    println(t.n);
+    print(t.n, '\n');
     shuffle(t.edges.begin(), t.edges.end(), default_random_engine((random_device())()));
     for (auto e : t.edges) {
-        if (randint({0, 1})) swap(e.from, e.to);
+        if (randint(0, 1)) swap(e.from, e.to);
         if (t.has_edge_val)
-            print(e.from), print(e.to), println(e.val);
+            print(e.from, e.to, e.val, '\n');
         else
-            print(e.from), println(e.to);
+            print(e.from, e.to, '\n');
     }
 }
 
