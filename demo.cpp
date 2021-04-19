@@ -1,13 +1,7 @@
-# OI-generator
-A useful and convient generator for OI
-
-## demo
-```cpp
+// author: ycp | https://ycpedef.github.io
 #include "generator.h"
 int main() {
-
     using namespace gen;
-
     // 生成一个长度为 10，值域为 [-20, 20] 的数组
     auto a = generate_list(10, {-20, 20});//此时 a 的类型是vector<long long>
     // 生成一个长度为 10，值域为 [-20, 20] 的数组，互不重复
@@ -46,5 +40,3 @@ int main() {
     //print({v1, v2}, '\n'); // CE
     print({(ll)v1, v2}, '\n'); // OK
 }
-
-```

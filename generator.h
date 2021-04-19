@@ -39,7 +39,7 @@ void println(const T& x) {
 }
 
 template<typename T>
-void print(const initializer_list<T>& a, char end = '\n') {
+void print(const initializer_list<T>& a, char end = '\0') {
     for (auto i : a) print(i);
     putchar(end);
 }
@@ -193,7 +193,7 @@ public:
 };
 
 tree generate_random_tree(const int&);
-tree generate_random_tree_with_val(const int&, const range&, int extra);
+tree generate_random_tree(const int&, const range&, int extra);
 
 tree generate_random_tree(const int& size) {
     tree res;
@@ -206,7 +206,7 @@ tree generate_random_tree(const int& size) {
     return res;
 }
 
-tree generate_random_tree_with_val(const int& size, const range& val_range, int extra = 0) {
+tree generate_random_tree(const int& size, const range& val_range, int extra = 0) {
     tree res = generate_random_tree(size);
     res.has_edge_val = 1;
     auto edge_val = generate_list(size - 1, val_range, extra);
@@ -227,7 +227,7 @@ tree::tree(const int& size) {
 }
 
 tree::tree(const int& size, const range& val_range, int extra = 0) {
-    auto t = generate_random_tree_with_val(size, val_range, extra);
+    auto t = generate_random_tree(size, val_range, extra);
     has_edge_val = t.has_edge_val, n = t.n;
     edges = t.edges;
 }
