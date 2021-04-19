@@ -5,9 +5,7 @@ A useful and convient generator for OI
 ```cpp
 #include "generator.h"
 int main() {
-
     using namespace gen;
-
     // 生成一个长度为 10，值域为 [-20, 20] 的数组
     auto a = generate_list(10, {-20, 20});//此时 a 的类型是vector<long long>
     // 生成一个长度为 10，值域为 [-20, 20] 的数组，互不重复
@@ -19,11 +17,11 @@ int main() {
     // 在一行输出一个数组
     print(a);
     // 输出多个数组
-    print({b, c, d});
+    print(b, c, d);
 
     // 一行输出多个数
     int x = 10, y = -1, z = 5;
-    print({x, y}, '\n');
+    print(x, y, '\n');
 
     // 生成一颗节点大小为 10 的树，两种方法等价
     tree t1(10);
@@ -34,17 +32,16 @@ int main() {
     // 生成一颗节点大小为 10 的树，边权值域为 [-20, 20]，权值互不重复，两种方法等价
     tree t5(10, {-20, 20}, limits::unique);
     auto t6 = generate_random_tree(10, {-20, 20}, limits::unique);
-    // 两种输出方式
-    print(t1), print(t2);
-    print({t3, t4, t5, t6});
+    // 输出
+    print(t1, t2, t3, t4, t5, t6);
 
-    // 随机数，值域 [-20, 20]
-    int v1 = randint(-20, 20);
-    // 随机数，值域 [-1e12, 1e12]
     using ll = long long;
-    ll v2 = randint(-1e12, 1e12);
-    //print({v1, v2}, '\n'); // CE
-    print({(ll)v1, v2}, '\n'); // OK
+    // 随机数，值域 [-20, 20]
+    ll v1 = randint(-20, 20);
+    // 随机数，值域 [0, 10]
+    ll v2 = randint(10);
+    // 随机数，值域 [-1e12, 1e12]
+    ll v3 = randint(-1e12, 1e12);
+    print(v1, v2, v3, '\n');
 }
-
 ```
