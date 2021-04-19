@@ -245,7 +245,3 @@ void print(tree t) {
 }
 
 } // namespace gen
-
-int main() {
-    return 0;
-}
