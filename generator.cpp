@@ -10,6 +10,8 @@
 #include <random>
 #include <vector>
 
+namespace gen {
+
 using namespace std;
 
 using T = long long;
@@ -34,6 +36,12 @@ void print(const vector<T>& a) {
 
 void println(const T& x) {
     write(x), endline();
+}
+
+template<typename T>
+void print(const initializer_list<T>& a, char end = '\n') {
+    for (auto i : a) print(i);
+    putchar(end);
 }
 
 struct range {
@@ -235,6 +243,8 @@ void print(tree t) {
             print(e.from), println(e.to);
     }
 }
+
+} // namespace gen
 
 int main() {
     return 0;
