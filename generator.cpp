@@ -140,7 +140,6 @@ vector<T> generate_non_increase_list(const int& size, const range& val) {
 
 vector<T> generate_unique_list(const int& size, const range& val) {
     vector<T> res = generate_increase_list(size, val);
-    print(res);
     shuffle(res.begin(), res.end(), default_random_engine((random_device())()));
     return res;
 }
@@ -237,13 +236,6 @@ void print(tree t) {
     }
 }
 
-int n, m, q;
-
 int main() {
-    auto x = generate_list(20, {-100, 100}, limits::unique | limits::increase);
-    print(x);
-
-    tree t(20, {-10, 10}, limits::unique);
-    print(t);
     return 0;
 }
