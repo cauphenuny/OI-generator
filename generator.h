@@ -199,7 +199,7 @@ public:
 };
 
 tree generate_random_tree(const int&);
-tree generate_random_tree(const int&, const range&, int extra);
+tree generate_random_tree(const int&, const range&, int extra = 0);
 
 tree generate_random_tree(const int& size) {
     tree res;
@@ -212,7 +212,7 @@ tree generate_random_tree(const int& size) {
     return res;
 }
 
-tree generate_random_tree(const int& size, const range& val_range, int extra = 0) {
+tree generate_random_tree(const int& size, const range& val_range, int extra) {
     tree res = generate_random_tree(size);
     res.has_edge_val = 1;
     auto edge_val = generate_list(size - 1, val_range, extra);
@@ -254,23 +254,42 @@ void print(tree t) {
 
 namespace gen_abbr {
 
-#define set_alias(cur_func, old_func); \
-    template <typename... T> \
-    constexpr auto cur_func(T&&... args) -> decltype(old_func(std::forward<T>(args)...)) { \
-        return old_func(std::forward<T>(args)...); \
+    using namespace gen;
+
+    tree grt(const int& size) {
+        return generate_random_tree(size);
     }
+    tree grt(const int& size, const range& val_range, int extra = 0) {
+        return generate_random_tree(size, val_range, extra);
+    }
+    vector<T> gl(const int& size, const range& val, int extra = 0) {
+        return generate_list(size, val, extra);
+    }
+    vector<T> gl(const int& size, function<T(const vector<T>&)> generate) {
+        return generate_list(size, generate);
+    }
+    vector<T> gil(const int& size, const range& val) {
+        return generate_increase_list(size, val);
+    }
+    vector<T> gdl(const int& size, const range& val) {
+        return generate_decrease_list(size, val);
+    }
+    vector<T> gul(const int& size, const range& val) {
+        return generate_unique_list(size, val);
+    }
+    vector<T> gndl(const int& size, const range& val) {
+        return generate_non_decrease_list(size, val);
+    }
+    vector<T> gnil(const int& size, const range& val) {
+        return generate_non_increase_list(size, val);
+    }
+    T ri(const range& a) { return randint(a); }
+    T ri(T l, T r) { return randint(range(l, r)); }
 
-    set_alias(ri, gen::randint);
-    set_alias(pr, gen::print);
-    set_alias(gl, gen::generate_list);
-    set_alias(gil, gen::generate_increase_list);
-    set_alias(gdl, gen::generate_decrease_list);
-    set_alias(gul, gen::generate_unique_list);
-    set_alias(gndl, gen::generate_non_decrease_list);
-    set_alias(gnil, gen::generate_non_increase_list);
-    set_alias(grt, gen::generate_random_tree);
-
-#undef set_alias
+    template<typename ...T>
+    auto pr(T ...args) -> decltype(print(args...)) {
+        return print(args...);
+    }
 
     namespace lmt {
         auto unq = gen::limits::unique;
