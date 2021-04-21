@@ -74,9 +74,9 @@ T randint(T l, T r) {
 // ======================================================== List =========================================================
 
 namespace limits {
-const int unique = 1 << 1;
-const int decrease = 1 << 2;
-const int increase = 1 << 3;
+    const int unique = 1 << 1;
+    const int decrease = 1 << 2;
+    const int increase = 1 << 3;
 }  // namespace limits
 
 vector<T> generate_list(const int&, const range&, int = 0);
@@ -251,3 +251,32 @@ void print(tree t) {
 }
 
 } // namespace gen
+
+namespace gen_abbr {
+
+#define set_alias(cur_func, old_func); \
+    template <typename... T> \
+    constexpr auto cur_func(T&&... args) -> decltype(old_func(std::forward<T>(args)...)) { \
+        return old_func(std::forward<T>(args)...); \
+    }
+
+    set_alias(ri, gen::randint);
+    set_alias(pr, gen::print);
+    set_alias(gl, gen::generate_list);
+    set_alias(gil, gen::generate_increase_list);
+    set_alias(gdl, gen::generate_decrease_list);
+    set_alias(gul, gen::generate_unique_list);
+    set_alias(gndl, gen::generate_non_decrease_list);
+    set_alias(gnil, gen::generate_non_increase_list);
+    set_alias(grt, gen::generate_random_tree);
+
+#undef set_alias
+
+    namespace lmt {
+        auto unq = gen::limits::unique;
+        auto dec = gen::limits::decrease;
+        auto inc = gen::limits::increase;
+    }
+
+} // namespace gen_abbr
+

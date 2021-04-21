@@ -34,7 +34,7 @@ int main() {
     using ll = long long;
     // 随机数，值域 [-20, 20]
     ll v1 = randint(-20, 20);
-    // 随机数，值域 [0, 10]
+    // 随机数，值域 [0, 10)
     ll v2 = randint(10);
     // 随机数，值域 [-1e12, 1e12]
     ll v3 = randint(-1e12, 1e12);
