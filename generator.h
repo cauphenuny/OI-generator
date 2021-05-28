@@ -34,14 +34,14 @@ void print(const string &s) {
 }
 
 template<typename T>
-void print(const vector<T>& a) {
-    for (auto i : a) print(i);
-    endline();
+void print(const T& x) {
+    write(x), putchar(' ');
 }
 
 template<typename T>
-void print(const T& x) {
-    write(x), putchar(' ');
+void print(const vector<T>& a) {
+    for (auto i : a) print(i);
+    endline();
 }
 
 template<typename T, typename ...T2>
