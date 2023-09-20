@@ -1,15 +1,14 @@
-// author: ycp | https://ycpedef.github.io
 #include "generator.h"
 int main() {
     using namespace gen;
     // 生成一个长度为 10，值域为 [-20, 20] 的数组
-    auto a = generate_list(10, {-20, 20});//此时 a 的类型是vector<long long>
+    auto a = get_list(10, {-20, 20});//此时 a 的类型是vector<long long>
     // 生成一个长度为 10，值域为 [-20, 20] 的数组，互不重复
-    auto b = generate_list(10, {-20, 20}, limits::unique);
+    auto b = get_list(10, {-20, 20}, limits::unique);
     // 生成一个长度为 10，值域为 [-20, 20] 的数组，单调不升
-    auto c = generate_list(10, {-20, 20}, limits::decrease);
+    auto c = get_list(10, {-20, 20}, limits::decrease);
     // 生成一个长度为 10，值域为 [-20, 20] 的数组，单调递增
-    auto d = generate_list(10, {-20, 20}, limits::increase | limits::unique);
+    auto d = get_list(10, {-20, 20}, limits::increase | limits::unique);
     // 在一行输出一个数组
     print(a);
     // 输出多个数组
@@ -25,7 +24,7 @@ int main() {
 
     // 生成一颗节点大小为 10 的树，两种方法等价
     tree t1(10);
-    auto t2 = generate_tree(10);
+    auto t2 = get_tree(10);
     // 加上边权，随机范围[0, 10]
     t2.add_edge_weight({0, 10});
     // 输出

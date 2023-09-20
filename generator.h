@@ -8,6 +8,12 @@
 #include <random>
 #include <vector>
 
+#define _debug(x) cerr << #x << " = " << (x) << " "
+#define _debugln(x) cerr << #x << " = " << (x) << endl
+#define _debugf(...) fprintf(stderr, __VA_ARGS__)
+#define _wlog(fmt, ...) \
+    fprintf(stderr, "<%s:%d> " fmt "\n", __func__, __LINE__, ## __VA_ARGS__)
+
 namespace gen {
 
 using namespace std;
@@ -52,7 +58,7 @@ struct range {
     T l, r;
     T size() const { return r - l + 1; }
     range(const T& x) { l = 0, r = x - 1; }
-    range(const T& _l, const T& _r) { l = _l, r = _r; }
+    range(const T& _l, const T& _r) { l = _l, r = _r;}
     range(const initializer_list<T>& a) {
         l = *(a.begin());
         r = *(next(a.begin()));
@@ -77,30 +83,30 @@ namespace limits {
     const int increase = 1 << 3;
 }  // namespace limits
 
-vector<T> generate_list(const int&, const range&, int = 0);
-vector<T> generate_list(const int&, function<T(const vector<T>&)>);
-vector<T> generate_increase_list(const int&, const range&);
-vector<T> generate_decrease_list(const int&, const range&);
-vector<T> generate_unique_list(const int&, const range&);
-vector<T> generate_non_decrease_list(const int&, const range&);
-vector<T> generate_non_increase_list(const int&, const range&);
+vector<T> get_list(const int&, const range&, int = 0);
+vector<T> get_list(const int&, function<T(const vector<T>&)>);
+vector<T> get_increase_list(const int&, const range&);
+vector<T> get_decrease_list(const int&, const range&);
+vector<T> get_unique_list(const int&, const range&);
+vector<T> get_non_decrease_list(const int&, const range&);
+vector<T> get_non_increase_list(const int&, const range&);
 
-vector<T> generate_list(const int& size, const range& a, int attr) {
+vector<T> get_list(const int& size, const range& a, int attr) {
     assert(size > 0);
     if (attr & limits::decrease) {
         if (attr & limits::unique)
-            return generate_decrease_list(size, a);
+            return get_decrease_list(size, a);
         else
-            return generate_non_increase_list(size, a);
+            return get_non_increase_list(size, a);
     }
     if (attr & limits::increase) {
         if (attr & limits::unique)
-            return generate_increase_list(size, a);
+            return get_increase_list(size, a);
         else
-            return generate_non_decrease_list(size, a);
+            return get_non_decrease_list(size, a);
     }
     if (attr & limits::unique) {
-        return generate_unique_list(size, a);
+        return get_unique_list(size, a);
     }
     vector<T> res;
     uniform_int_distribution<T> distrib(a.l, a.r);
@@ -108,14 +114,14 @@ vector<T> generate_list(const int& size, const range& a, int attr) {
     return res;
 }
 
-vector<T> generate_list(const int& size, function<T(const vector<T>&)> generate) {
+vector<T> get_list(const int& size, function<T(const vector<T>&)> generate) {
     assert(size >= 0);
     vector<T> res;
     for (int i = 0; i < size; i++) { res.push_back(generate(res)); }
     return res;
 }
 
-vector<T> generate_increase_list(const int& size, const range& val) {
+vector<T> get_increase_list(const int& size, const range& val) {
     assert(val.size() >= size);
     auto generate = [val, size](const vector<T>& cur) -> T {
         T prev;
@@ -128,30 +134,30 @@ vector<T> generate_increase_list(const int& size, const range& val) {
         r = min(r, (T)(val.r - (size - cur.size() - 1)));
         return randint(l, r);
     };
-    vector<T> res = generate_list(size, generate);
+    vector<T> res = get_list(size, generate);
     return res;
 }
 
-vector<T> generate_decrease_list(const int& size, const range& val) {
-    vector<T> res = generate_increase_list(size, val);
+vector<T> get_decrease_list(const int& size, const range& val) {
+    vector<T> res = get_increase_list(size, val);
     reverse(res.begin(), res.end());
     return res;
 }
 
-vector<T> generate_non_decrease_list(const int& size, const range& val) {
-    vector<T> res = generate_list(size, val);
+vector<T> get_non_decrease_list(const int& size, const range& val) {
+    vector<T> res = get_list(size, val);
     sort(res.begin(), res.end());
     return res;
 }
 
-vector<T> generate_non_increase_list(const int& size, const range& val) {
-    vector<T> res = generate_non_decrease_list(size, val);
+vector<T> get_non_increase_list(const int& size, const range& val) {
+    vector<T> res = get_non_decrease_list(size, val);
     reverse(res.begin(), res.end());
     return res;
 }
 
-vector<T> generate_unique_list(const int& size, const range& val) {
-    vector<T> res = generate_increase_list(size, val);
+vector<T> get_unique_list(const int& size, const range& val) {
+    vector<T> res = get_increase_list(size, val);
     shuffle(res.begin(), res.end(), default_random_engine((random_device())()));
     return res;
 }
@@ -178,7 +184,7 @@ public:
 
 void graph::add_edge_weight(const range& val_range, int attr) {
     has_edge_val = 1;
-    auto edge_val = generate_list(m, val_range, attr);
+    auto edge_val = get_list(m, val_range, attr);
     for (int i = 0; i < m; i++) {
         edges[i].val = edge_val[i];
     }
@@ -186,7 +192,7 @@ void graph::add_edge_weight(const range& val_range, int attr) {
 
 void graph::add_node_weight(const range& val_range, int attr) {
     has_node_val = 1;
-    node = generate_list(n, val_range, attr);
+    node = get_list(n, val_range, attr);
 }
 
 class tree : public graph {
@@ -199,9 +205,10 @@ class dag : public graph {
 public:
     dag();
     dag(const int& size);
+    dag(const int& size, const int& edge_cnt);
 };
 
-tree generate_tree(const int& size) {
+tree get_tree(const int& size) {
     return tree(size);
 }
 
@@ -228,8 +235,12 @@ tree::tree(const int& size) {
     shuffle(edges.begin(), edges.end(), default_random_engine((random_device())()));
 }
 
-dag generate_dag(const int& size) {
+dag get_dag(const int& size) {
     return dag(size);
+}
+
+dag get_dag(const int& size, const int& edge_size) {
+    return dag(size, edge_size);
 }
 
 dag::dag() {
@@ -241,14 +252,34 @@ dag::dag(const int& size) {
     m = 0;
     has_edge_val = has_node_val = 0;
     vector<T> id(n);
-    for (int i = 0; i < n; i++) {
-        id[i] = i + 1;
-    }
+    for (int i = 0; i < n; i++) id[i] = i + 1;
     shuffle(id.begin(), id.end(), default_random_engine((random_device())()));
     for (int i = 1; i < size; i++) {
         int cnt = randint(0, i);
         m += cnt;
-        auto targets = generate_unique_list(cnt, {0, i - 1});
+        auto targets = get_unique_list(cnt, {0, i - 1});
+        for (auto t : targets) {
+            edges.push_back(edge(id[i], id[t]));
+        }
+    }
+    shuffle(edges.begin(), edges.end(), default_random_engine((random_device())()));
+}
+
+dag::dag(const int& size, const int& edge_size) {
+    n = size, m = edge_size;
+    has_edge_val = has_node_val = 0;
+    vector<T> id(n);
+    for (int i = 0; i < n; i++) id[i] = i + 1;
+    shuffle(id.begin(), id.end(), default_random_engine((random_device())()));
+    int res = m;
+    for (int i = 1; i < n; i++) {
+        _debugf("i = %d:\n", i);
+        _debug(max(0, res - (i+n) * (n-i-1) / 2)), _debugln(min(i, res));
+        int cnt = randint(max(0, res - (i+n) * (n-i-1) / 2), min(i, res));
+        _debugln(cnt);
+        res -= cnt;
+        auto targets = get_unique_list(cnt, {0, i - 1});
+        _debugln(targets.size());
         for (auto t : targets) {
             edges.push_back(edge(id[i], id[t]));
         }
@@ -279,48 +310,3 @@ void print(dag _d) {
 }
 
 } // namespace gen
-
-namespace gen_abbr {
-
-    using namespace gen;
-
-    tree gt(const int& size) {
-        return generate_tree(size);
-    }
-    vector<T> gl(const int& size, const range& val, int attr = 0) {
-        return generate_list(size, val, attr);
-    }
-    vector<T> gl(const int& size, function<T(const vector<T>&)> generate) {
-        return generate_list(size, generate);
-    }
-    vector<T> gil(const int& size, const range& val) {
-        return generate_increase_list(size, val);
-    }
-    vector<T> gdl(const int& size, const range& val) {
-        return generate_decrease_list(size, val);
-    }
-    vector<T> gul(const int& size, const range& val) {
-        return generate_unique_list(size, val);
-    }
-    vector<T> gndl(const int& size, const range& val) {
-        return generate_non_decrease_list(size, val);
-    }
-    vector<T> gnil(const int& size, const range& val) {
-        return generate_non_increase_list(size, val);
-    }
-    T ri(const range& a) { return randint(a); }
-    T ri(T l, T r) { return randint(range(l, r)); }
-
-    template<typename ...T>
-    auto pr(T ...args) -> decltype(print(args...)) {
-        return print(args...);
-    }
-
-    namespace lmt {
-        auto unq = gen::limits::unique;
-        auto dec = gen::limits::decrease;
-        auto inc = gen::limits::increase;
-    }
-
-} // namespace gen_abbr
-
