@@ -1,5 +1,3 @@
-//author: ycp | https://ycpedef.github.io
-//type: generator
 #include <algorithm>
 #include <cassert>
 #include <chrono>
@@ -87,21 +85,21 @@ vector<T> generate_unique_list(const int&, const range&);
 vector<T> generate_non_decrease_list(const int&, const range&);
 vector<T> generate_non_increase_list(const int&, const range&);
 
-vector<T> generate_list(const int& size, const range& a, int extra) {
+vector<T> generate_list(const int& size, const range& a, int attr) {
     assert(size > 0);
-    if (extra & limits::decrease) {
-        if (extra & limits::unique)
+    if (attr & limits::decrease) {
+        if (attr & limits::unique)
             return generate_decrease_list(size, a);
         else
             return generate_non_increase_list(size, a);
     }
-    if (extra & limits::increase) {
-        if (extra & limits::unique)
+    if (attr & limits::increase) {
+        if (attr & limits::unique)
             return generate_increase_list(size, a);
         else
             return generate_non_decrease_list(size, a);
     }
-    if (extra & limits::unique) {
+    if (attr & limits::unique) {
         return generate_unique_list(size, a);
     }
     vector<T> res;
@@ -111,7 +109,7 @@ vector<T> generate_list(const int& size, const range& a, int extra) {
 }
 
 vector<T> generate_list(const int& size, function<T(const vector<T>&)> generate) {
-    assert(size > 0);
+    assert(size >= 0);
     vector<T> res;
     for (int i = 0; i < size; i++) { res.push_back(generate(res)); }
     return res;
@@ -168,85 +166,115 @@ struct edge {
                                   val(v) {}
 };
 
-class non_directed_graph {
+class graph {
 public:
     bool has_edge_val, has_node_val;
     int n, m;
     vector<edge> edges;
     vector<T> node;
+    void add_node_weight(const range&, int = 0);
+    void add_edge_weight(const range&, int = 0);
 };
 
-class directed_graph {
-public:
-    bool has_edge_val, has_node_val;
-    int n, m;
-    vector<edge> edges;
-    vector<T> node;
-};
+void graph::add_edge_weight(const range& val_range, int attr) {
+    has_edge_val = 1;
+    auto edge_val = generate_list(m, val_range, attr);
+    for (int i = 0; i < m; i++) {
+        edges[i].val = edge_val[i];
+    }
+}
 
-class tree : public non_directed_graph {
+void graph::add_node_weight(const range& val_range, int attr) {
+    has_node_val = 1;
+    node = generate_list(n, val_range, attr);
+}
+
+class tree : public graph {
 public:
     tree();
     tree(const int& size);
-    tree(const int& size, const range&, int extra);
 };
 
-class dag : public directed_graph {
+class dag : public graph {
 public:
     dag();
     dag(const int& size);
-    dag(const int& size, const range&, int extra);
 };
 
-tree generate_random_tree(const int&);
-tree generate_random_tree(const int&, const range&, int extra = 0);
-
-tree generate_random_tree(const int& size) {
-    tree res;
-    res.n = size;
-    res.has_edge_val = 0;
-    for (int i = 2; i <= size; i++) {
-        int j = randint(1, i - 1);
-        res.edges.push_back(edge(j, i));
-    }
-    return res;
-}
-
-tree generate_random_tree(const int& size, const range& val_range, int extra) {
-    tree res = generate_random_tree(size);
-    res.has_edge_val = 1;
-    auto edge_val = generate_list(size - 1, val_range, extra);
-    for (int i = 0; i < size - 1; i++) {
-        res.edges[i].val = edge_val[i];
-    }
-    return res;
+tree generate_tree(const int& size) {
+    return tree(size);
 }
 
 tree::tree() {
-    has_edge_val = n = 0;
+    has_node_val = has_edge_val = n = 0;
 }
+
+//TODO: optimize copy reference
 
 tree::tree(const int& size) {
-    auto t = generate_random_tree(size);
-    has_edge_val = t.has_edge_val, n = t.n;
-    edges = t.edges;
+    n = size;
+    m = size - 1;
+    has_edge_val = 0;
+    has_node_val = 0;
+    vector<T> id(n);
+    for (int i = 0; i < n; i++) {
+        id[i] = i + 1;
+    }
+    shuffle(id.begin(), id.end(), default_random_engine((random_device())()));
+    for (int i = 1; i < size; i++) {
+        int j = randint(0, i - 1);
+        edges.push_back(edge(id[j], id[i]));
+    }
+    shuffle(edges.begin(), edges.end(), default_random_engine((random_device())()));
 }
 
-tree::tree(const int& size, const range& val_range, int extra = 0) {
-    auto t = generate_random_tree(size, val_range, extra);
-    has_edge_val = t.has_edge_val, n = t.n;
-    edges = t.edges;
+dag generate_dag(const int& size) {
+    return dag(size);
 }
 
-void print(tree t) {
-    print(t.n, '\n');
-    shuffle(t.edges.begin(), t.edges.end(), default_random_engine((random_device())()));
-    for (auto e : t.edges) {
+dag::dag() {
+    has_node_val = has_edge_val = n = 0;
+}
+
+dag::dag(const int& size) {
+    n = size;
+    m = 0;
+    has_edge_val = has_node_val = 0;
+    vector<T> id(n);
+    for (int i = 0; i < n; i++) {
+        id[i] = i + 1;
+    }
+    shuffle(id.begin(), id.end(), default_random_engine((random_device())()));
+    for (int i = 1; i < size; i++) {
+        int cnt = randint(0, i);
+        m += cnt;
+        auto targets = generate_unique_list(cnt, {0, i - 1});
+        for (auto t : targets) {
+            edges.push_back(edge(id[i], id[t]));
+        }
+    }
+    shuffle(edges.begin(), edges.end(), default_random_engine((random_device())()));
+}
+
+void print(tree _t) {
+    print(_t.n, '\n');
+    for (auto e : _t.edges) {
         if (randint(0, 1)) swap(e.from, e.to);
-        if (t.has_edge_val)
+        if (_t.has_edge_val)
             print(e.from, e.to, e.val, '\n');
         else
             print(e.from, e.to, '\n');
+    }
+}
+
+void print(dag _d) {
+    print(_d.n, _d.m, '\n');
+    for (auto e : _d.edges) {
+        if (_d.has_edge_val) {
+            print(e.from, e.to, e.val, '\n');
+        } else {
+            print(e.from, e.to, '\n');
+        }
     }
 }
 
@@ -256,14 +284,11 @@ namespace gen_abbr {
 
     using namespace gen;
 
-    tree grt(const int& size) {
-        return generate_random_tree(size);
+    tree gt(const int& size) {
+        return generate_tree(size);
     }
-    tree grt(const int& size, const range& val_range, int extra = 0) {
-        return generate_random_tree(size, val_range, extra);
-    }
-    vector<T> gl(const int& size, const range& val, int extra = 0) {
-        return generate_list(size, val, extra);
+    vector<T> gl(const int& size, const range& val, int attr = 0) {
+        return generate_list(size, val, attr);
     }
     vector<T> gl(const int& size, function<T(const vector<T>&)> generate) {
         return generate_list(size, generate);

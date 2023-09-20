@@ -15,21 +15,31 @@ int main() {
     // 输出多个数组
     print(b, c, d);
 
+    print('\n');
+
     // 一行输出多个数
     int x = 10, y = -1, z = 5;
-    print(x, y, '\n');
+    print(x, y, z, '\n');
+
+    print('\n');
 
     // 生成一颗节点大小为 10 的树，两种方法等价
     tree t1(10);
-    auto t2 = generate_random_tree(10);
-    // 生成一颗节点大小为 10 的树，边权值域为 [-20, 20]，两种方法等价
-    tree t3(10, {-20, 20});
-    auto t4 = generate_random_tree(10, {-20, 20});
-    // 生成一颗节点大小为 10 的树，边权值域为 [-20, 20]，权值互不重复，两种方法等价
-    tree t5(10, {-20, 20}, limits::unique);
-    auto t6 = generate_random_tree(10, {-20, 20}, limits::unique);
+    auto t2 = generate_tree(10);
+    // 加上边权，随机范围[0, 10]
+    t2.add_edge_weight({0, 10});
     // 输出
-    print(t1, t2, t3, t4, t5, t6);
+    print(t1, t2);
+
+    print('\n');
+
+    // 生成一个节点数量为 5 的有向无环图
+    dag d1(5);
+    // 加上点权，随机范围[0, 10]
+    d1.add_node_weight({0, 10});
+    print(d1); // 默认不输出点权，若要输出，加上一行print(d1.node);
+
+    print('\n');
 
     using ll = long long;
     // 随机数，值域 [-20, 20]
