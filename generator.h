@@ -273,13 +273,13 @@ dag::dag(const int& size, const int& edge_size) {
     shuffle(id.begin(), id.end(), default_random_engine((random_device())()));
     int res = m;
     for (int i = 1; i < n; i++) {
-        _debugf("i = %d:\n", i);
-        _debug(max(0, res - (i+n) * (n-i-1) / 2)), _debugln(min(i, res));
+        //_debugf("i = %d:\n", i);
+        //_debug(max(0, res - (i+n) * (n-i-1) / 2)), _debugln(min(i, res));
         int cnt = randint(max(0, res - (i+n) * (n-i-1) / 2), min(i, res));
-        _debugln(cnt);
+        //_debugln(cnt);
         res -= cnt;
         auto targets = get_unique_list(cnt, {0, i - 1});
-        _debugln(targets.size());
+        //_debugln(targets.size());
         for (auto t : targets) {
             edges.push_back(edge(id[i], id[t]));
         }
